@@ -1,0 +1,65 @@
+---
+title: "Harm done by Severe Weather Conditions in the US"
+author: "Raymond"
+date: "January 19, 2017"
+output: html_document
+---
+
+###Synopsis
+
+
+The purpose of this brief analysis is to see which severe weather conditions cause the mot harm to population health (in terms of fatalities) and have the greatest economic consequences (in terms of damage to crops)
+
+####Population Health
+The weather conditions which lead to the highest number of fatalities (i.e. harm to population health/well-being) are (in decreasing order) Tornado, Excesssive Heat, Flash Floods, Heat, Lightening, and Wind.
+
+
+####Economic Consequences
+The weather conditions which lead to the greatest amount of financial damage (in billions) to crops are (in decreasing order) Ice Storms, River Floods, Hurricane/ Typhoon, Drought, Heat and Freeze
+
+
+###Data Processing
+####Population Health
+After loading the data in from "bz2" format, we sum up the number of Fatalities by each Event Type. After that, I sorted by Fatalities SUM in decreasing order, and selected the top six Event Type from sorted list.
+
+####Economic Consequences
+I first identified the unique types of "exponents" in CROPDMGEXP row. I selected the rows with "B" which indicates "Billions" into a separate table, and summed the CROPDMG amount by each Event Type.
+
+
+```{r dataProcesing, cache = TRUE}
+tt = read.csv( "D:\\Users\\msboon\\Desktop\\repdata%2Fdata%2FStormData.csv.bz2")
+fatalitytable = tapply(tt$FATALITIES,tt$EVTYPE,sum)
+
+dd = names(table(tt$CROPDMGEXP))
+unique(dd)
+crop_b_index = which(tt$CROPDMGEXP=="B")
+crop = tt[crop_b_index,]
+croptable = tapply(crop$CROPDMG,as.character(crop$EVTYPE), sum)
+
+```
+
+
+###Results
+Below is the bar chart showing the top six (6) Weather Conditions that leads to the highest cumulative number of Fatalities
+
+```{r resultsFatalities, cache=TRUE}
+barplot(head(sort(fatalitytable, decreasing=TRUE)),col="lightblue",
+        main = "Top six severe weathers by fatalities",
+        ylab = "No. of fatalities", xlab = "Severe Weather",
+        ylim=c(0,6000))
+
+```
+
+
+And now, below is the bar chart showing the top six (6) Weather Conditions that leads to the highest cumuative Crop Damage in Billions
+
+```{r resultsCropDamage, cache = TRUE}
+barplot(head(sort(croptable, decreasing=TRUE)),col="lightblue",
+        main = "Top six severe weathers by crop damage (Billions)",
+        ylab = "Crop Damage Amount (Billions)", xlab = "Severe Weather",
+        ylim=c(0,5.5))
+
+```
+
+
+
